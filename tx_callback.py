@@ -187,6 +187,7 @@ if __name__ == '__main__':
     atexit.register(cleanup)
     
     # 启动服务
+    print("当前端口:", Config.FLASK_PORT)
     try:
         app.run(host='0.0.0.0', port=Config.FLASK_PORT, debug=False)
     except KeyboardInterrupt:

@@ -1,0 +1,37 @@
+[Unit]
+Description=TX Callback Service (Flask via Gunicorn)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/tx_callback
+# 让 systemd 使用你的虚拟环境
+Environment="PATH=/home/ubuntu/tx_callback/venv/bin"
+Environment="PYTHONUNBUFFERED=1"
+# 如果以后要用环境变量存敏感信息，可启用下一行并创建 /etc/tx_callback.env
+# EnvironmentFile=/etc/tx_callback.env
+
+# Gunicorn 启动命令（确认入口是 tx_callback:app）
+ExecStart=/home/ubuntu/tx_callback/venv/bin/gunicorn \
+  --workers 4 \
+  --bind 0.0.0.0:8787 \
+  --timeout 120 \
+  --graceful-timeout 30 \
+  --access-logfile - \
+  --error-logfile - \
+  tx_callback:app
+
+Restart=always
+RestartSec=5
+# 更优雅的停止
+KillSignal=SIGQUIT
+TimeoutStopSec=30
+
+# 进程安全（可选增强）
+# NoNewPrivileges=true
+# PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
